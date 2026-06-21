@@ -2,7 +2,7 @@
 
 > Minecraft server stress-testing addon for Meteor Client
 
-**Client2End** — набор модулей для нагрузочного тестирования Minecraft серверов (Vanilla, Spigot, Paper, Aternos). Предназначен исключительно для законного пентеста собственных серверов.
+**Client2End** — набор модулей для нагрузочного тестирования Minecraft серверов (Vanilla, Spigot, Paper). Предназначен исключительно для законного пентеста собственных серверов.
 
 ## Модули
 
