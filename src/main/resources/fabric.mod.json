@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "client-2-end",
+  "version": "${version}",
+  "name": "Client2End",
+  "description": "An addon template for Meteor Client addons.",
+  "authors": [
+    "BURAT1NO"
+  ],
+  "contact": {
+    "sources": "https://github.com/MeteorDevelopment/meteor-addon-template"
+  },
+  "icon": "assets/template/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "meteor": [
+      "com.client2end.addon.Client2End"
+    ]
+  },
+  "mixins": [
+    "addon-template.mixins.json"
+  ],
+  "custom": {
+    "meteor-client:color": "225,25,25",
+    "modmenu": {
+      "parent": {
+        "id": "meteor-client"
+      }
+    }
+  },
+  "depends": {
+    "java": ">=21",
+    "minecraft": ["${mc_version}"],
+    "meteor-client": "*"
+  }
+}
