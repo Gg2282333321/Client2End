@@ -5,6 +5,7 @@ import com.client2end.addon.hud.HudExample;
 import com.client2end.addon.modules.ChestCrash;
 import com.client2end.addon.modules.ModuleExample;
 import com.client2end.addon.modules.ModuleTestC2S;
+import com.client2end.addon.modules.OOMCrash;
 import com.client2end.addon.modules.Spammer;
 import com.client2end.addon.modules.TCPFlood;
 import meteordevelopment.meteorclient.addons.GithubRepo;
@@ -31,6 +32,7 @@ public class Client2End extends MeteorAddon {
         Modules.get().add(new ChestCrash());
         Modules.get().add(new Spammer());
         Modules.get().add(new TCPFlood());
+        Modules.get().add(new OOMCrash());
 
         Commands.add(new CommandExample());
 

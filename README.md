@@ -2,7 +2,7 @@
 
 > Minecraft server stress-testing addon for Meteor Client
 
-**Client2End** — набор модулей для нагрузочного тестирования Minecraft серверов. Предназначен исключительно для законного пентеста собственных серверов.
+**Client2End** — набор модулей для нагрузочного тестирования Minecraft серверов (Vanilla, Spigot, Paper, Aternos). Предназначен исключительно для законного пентеста собственных серверов.
 
 ## Модули
 
@@ -11,6 +11,7 @@
 | **Spammer** | Спам пакетами (9 методов) | Move, TabComplete, CreativeBomb, Payload и другие |
 | **ChestCrash** | Open/close сундука | Открытие/закрытие контейнера |
 | **TCP Flood** | TCP-флуд через raw сокеты | Handshake + Login Start |
+| **OOM Crash** | OutOfMemory через fake NBT array length | CreativeInventoryAction + IntArray (mixin) |
 
 ### Методы Spammer
 
@@ -23,6 +24,15 @@
 - **CreativeBomb** — CreativeInventoryActionC2SPacket + NBT 250КБ
 - **TabComplete** — RequestCommandCompletionsC2SPacket (32КБ)
 - **InteractItem** — PlayerInteractItemC2SPacket (use предмета)
+- **OOM** — CreativeInventoryAction с IntArray (реальный большой массив)
+
+## Целевые сервера
+
+| Сервер | Эффективность |
+|---|---|
+| **Spigot** | OOM за 30-60 сек (10k/тик) |
+| **Paper** | packet-limiter (500/7с) — удержание под лимитом |
+| **Velocity** | Нет прямого доступа до сервера |
 
 ## Сборка
 

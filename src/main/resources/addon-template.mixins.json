@@ -3,7 +3,8 @@
   "package": "com.client2end.addon.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "ExampleMixin"
+    "ExampleMixin",
+    "NbtIntArrayMixin"
   ],
   "injectors": {
     "defaultRequire": 1
