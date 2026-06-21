@@ -24,14 +24,6 @@
 - **TabComplete** — RequestCommandCompletionsC2SPacket (32КБ)
 - **InteractItem** — PlayerInteractItemC2SPacket (use предмета)
 
-## Целевые сервера
-
-| Сервер | Эффективность |
-|---|---|
-| **Spigot** | OOM за 30-60 сек (10k/тик) |
-| **Paper** | packet-limiter (500/7с) — удержание под лимитом |
-| **Velocity** | Нет прямого доступа до сервера |
-
 ## Сборка
 
 ```bash
